@@ -1,7 +1,5 @@
 var webpack = require('webpack'),
   path = require('path'),
-  fileSystem = require('fs-extra'),
-  env = require('./utils/env'),
   { CleanWebpackPlugin } = require('clean-webpack-plugin'),
   CopyWebpackPlugin = require('copy-webpack-plugin'),
   HtmlWebpackPlugin = require('html-webpack-plugin'),
@@ -12,9 +10,6 @@ const ASSET_PATH = process.env.ASSET_PATH || '/';
 var alias = {
   'react-dom': '@hot-loader/react-dom',
 };
-
-// load the secrets
-var secretsPath = path.join(__dirname, 'secrets.' + env.NODE_ENV + '.js');
 
 var fileExtensions = [
   'jpg',
@@ -29,16 +24,12 @@ var fileExtensions = [
   'woff2',
 ];
 
-if (fileSystem.existsSync(secretsPath)) {
-  alias['secrets'] = secretsPath;
-}
-
 var options = {
   mode: process.env.NODE_ENV || 'development',
   entry: {
-    options: path.join(__dirname, 'src', 'pages', 'Options', 'index.jsx'),
-    popup: path.join(__dirname, 'src', 'pages', 'Popup', 'index.jsx'),
-    background: path.join(__dirname, 'src', 'pages', 'Background', 'index.js'),
+    options: path.join(__dirname, 'src', 'pages', 'Options', 'index.tsx'),
+    popup: path.join(__dirname, 'src', 'pages', 'Popup', 'index.tsx'),
+    background: path.join(__dirname, 'src', 'pages', 'Background', 'index.ts'),
     contentScript: path.join(__dirname, 'src', 'pages', 'Content', 'index.ts'),
   },
   chromeExtensionBoilerplate: {
@@ -168,7 +159,7 @@ var options = {
   },
 };
 
-if (env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === 'development') {
   options.devtool = 'cheap-module-source-map';
 } else {
   options.optimization = {

@@ -2,11 +2,11 @@
 process.env.BABEL_ENV = 'development';
 process.env.NODE_ENV = 'development';
 process.env.ASSET_PATH = '/';
+const port = process.env.npm_config_port || 3000;
 
 var WebpackDevServer = require('webpack-dev-server'),
   webpack = require('webpack'),
   config = require('../webpack.config'),
-  env = require('./env'),
   path = require('path');
 
 var options = config.chromeExtensionBoilerplate || {};
@@ -15,7 +15,7 @@ var excludeEntriesToHotReload = options.notHotReload || [];
 for (var entryName in config.entry) {
   if (excludeEntriesToHotReload.indexOf(entryName) === -1) {
     config.entry[entryName] = [
-      'webpack-dev-server/client?http://localhost:' + env.PORT,
+      'webpack-dev-server/client?http://localhost:' + process.env.PORT,
       'webpack/hot/dev-server',
     ].concat(config.entry[entryName]);
   }
@@ -34,9 +34,9 @@ var server = new WebpackDevServer(compiler, {
   hot: true,
   injectClient: false,
   writeToDisk: true,
-  port: env.PORT,
+  port,
   contentBase: path.join(__dirname, '../build'),
-  publicPath: `http://localhost:${env.PORT}`,
+  publicPath: `http://localhost:${port}`,
   headers: {
     'Access-Control-Allow-Origin': '*',
   },
@@ -47,4 +47,4 @@ if (process.env.NODE_ENV === 'development' && module.hot) {
   module.hot.accept();
 }
 
-server.listen(env.PORT);
+server.listen(port);
