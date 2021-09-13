@@ -24,16 +24,14 @@ var fileExtensions = [
   'woff2',
 ];
 
+console.log(process.env.NODE_ENV);
+
 var options = {
-  mode: process.env.NODE_ENV || 'development',
   entry: {
     options: path.join(__dirname, 'src', 'pages', 'Options', 'index.tsx'),
     popup: path.join(__dirname, 'src', 'pages', 'Popup', 'index.tsx'),
     background: path.join(__dirname, 'src', 'pages', 'Background', 'index.ts'),
-    contentScript: path.join(__dirname, 'src', 'pages', 'Content', 'index.ts'),
-  },
-  chromeExtensionBoilerplate: {
-    notHotReload: ['contentScript'],
+    // contentScript: path.join(__dirname, 'src', 'pages', 'Content', 'index.ts'),
   },
   output: {
     path: path.resolve(__dirname, 'build'),
@@ -42,6 +40,11 @@ var options = {
   },
   module: {
     rules: [
+      {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
       {
         // look for .css or .scss files
         test: /\.(css|scss)$/,
@@ -74,7 +77,6 @@ var options = {
         loader: 'html-loader',
         exclude: /node_modules/,
       },
-      { test: /\.(ts|tsx)$/, loader: 'ts-loader', exclude: /node_modules/ },
       {
         test: /\.(js|jsx)$/,
         use: [
@@ -156,6 +158,12 @@ var options = {
   ],
   infrastructureLogging: {
     level: 'info',
+  },
+  devtool: 'inline-source-map',
+  devServer: {
+    static: path.join(__dirname, './build'),
+    port: 3001,
+    watchFiles: ['src/**/*.ts', 'src/**/*.tsx'],
   },
 };
 
