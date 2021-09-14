@@ -4,8 +4,9 @@ var webpack = require('webpack'),
   CopyWebpackPlugin = require('copy-webpack-plugin'),
   HtmlWebpackPlugin = require('html-webpack-plugin'),
   TerserPlugin = require('terser-webpack-plugin');
+// const RunChromeExtension = require('webpack-run-chrome-extension');
 
-const ASSET_PATH = process.env.ASSET_PATH || '/';
+const ASSET_PATH = '/';
 
 var alias = {
   'react-dom': '@hot-loader/react-dom',
@@ -24,19 +25,17 @@ var fileExtensions = [
   'woff2',
 ];
 
-console.log(process.env.NODE_ENV);
-
 var options = {
   entry: {
     options: path.join(__dirname, 'src', 'pages', 'Options', 'index.tsx'),
     popup: path.join(__dirname, 'src', 'pages', 'Popup', 'index.tsx'),
     background: path.join(__dirname, 'src', 'pages', 'Background', 'index.ts'),
-    // contentScript: path.join(__dirname, 'src', 'pages', 'Content', 'index.ts'),
+    contentScript: path.join(__dirname, 'src', 'pages', 'Content', 'index.ts'),
   },
   output: {
     path: path.resolve(__dirname, 'build'),
     filename: '[name].bundle.js',
-    publicPath: ASSET_PATH,
+    publicPath: 'http://localhost:3001',
   },
   module: {
     rules: [
@@ -98,6 +97,9 @@ var options = {
       .concat(['.js', '.jsx', '.ts', '.tsx', '.css']),
   },
   plugins: [
+    new webpack.DefinePlugin({
+      'process.env.ASSET_PATH': JSON.stringify(ASSET_PATH),
+    }),
     new webpack.ProgressPlugin(),
     // clean the build folder
     new CleanWebpackPlugin({
@@ -155,15 +157,32 @@ var options = {
       chunks: ['popup'],
       cache: false,
     }),
+    // new RunChromeExtension({
+    //   extensionPath: './src', // Only required field
+    //   browserFlags: [
+    //     '--enable-experimental-extension-apis',
+    //     '--embedded-extension-options',
+    //   ],
+    //   startingUrl: 'https://notion.com',
+    //   autoReload: true,
+    //   port: 8081,
+    // }),
   ],
   infrastructureLogging: {
     level: 'info',
   },
   devtool: 'inline-source-map',
   devServer: {
-    static: path.join(__dirname, './build'),
+    devMiddleware: {
+      index: true,
+      mimeTypes: { 'text/html': ['phtml'] },
+      publicPath: './build',
+      serverSideRender: true,
+      writeToDisk: true,
+    },
     port: 3001,
     watchFiles: ['src/**/*.ts', 'src/**/*.tsx'],
+    hot: true,
   },
 };
 
